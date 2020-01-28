@@ -82,6 +82,7 @@ void setup () {
 
 
 void loop() {
+  
   pixels.clear();
   now = rtc.now();
 

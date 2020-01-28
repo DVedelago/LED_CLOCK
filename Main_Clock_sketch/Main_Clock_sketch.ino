@@ -91,13 +91,70 @@ void loop() {
   minuti.UpdateIntensity(now.minute());
   ore.UpdateIntensity(hourposition(now.hour()));
 
+
+  //approach to color summing: each unit's intensity summed to the others should never give more than 1... wrong
+  //float tempIntensity = constrain(secondi.intensity[i] + minuti.intensity[i] + ore.intensity[i], 0, 1);
+
+  
+  //in order to have the single R/G/B component not to ecceed the 0-255 value,
+  //each component must be limited to 85
+  
   for(int i=0; i<NUMPIXELS; i++){
-    pixels.setPixelColor(i, pixels.Color(ore.intensity[i], ore.intensity[i], ore.intensity[i]));
+    //scale down the intensity to adapt the number to the sum parameters
+    if(ore.intensity[i]>0){
+      htempColorRED += (ore.intensity[i]*ore.red);
+      htempColorRED = constrain(htempColorRED, 0, 85);
+      
+      htempColorGREEN += (ore.intensity[i]*ore.green);
+      htempColorGREEN = constrain(htempColorGREEN, 0, 85);
+      
+      htempColorBLUE += (ore.intensity[i]*ore.blue); 
+      htempColorRED = constrain(htempColorBLUE, 0, 85);
+/*
+      Serial.print("htempColorRed = "); Serial.print(htempColorRED); Serial.println();
+      Serial.print("htempColorGreen = "); Serial.print(htempColorGREEN); Serial.println();
+      Serial.print("htempColorBlue = "); Serial.print(htempColorBLUE); Serial.println();
+*/  
+    }
     
-    pixels.setPixelColor(i, pixels.Color(minuti.intensity[i], minuti.intensity[i], minuti.intensity[i]));
+  
+    if(minuti.intensity[i]>0){
+      mtempColorRED += (minuti.intensity[i]*minuti.red);
+      mtempColorRED = constrain(mtempColorRED, 0, 85);
+      
+      mtempColorGREEN += (minuti.intensity[i]*minuti.green);
+      mtempColorGREEN = constrain(mtempColorGREEN, 0, 85);
+      
+      mtempColorBLUE += (minuti.intensity[i]*minuti.blue);
+      mtempColorRED = constrain(mtempColorBLUE, 0, 85);
+/*
+      Serial.print("mtempColorRed = "); Serial.print(mtempColorRED); Serial.println();
+      Serial.print("mtempColorGreen = "); Serial.print(mtempColorGREEN); Serial.println();
+      Serial.print("mtempColorBlue = "); Serial.print(mtempColorBLUE); Serial.println();
+*/  
+    }
+  
     
-    pixels.setPixelColor(i, pixels.Color(secondi.intensity[i], secondi.intensity[i], secondi.intensity[i]));
+    stempColorRED += (secondi.intensity[i]*secondi.red);
+    stempColorRED = constrain(stempColorRED, 0, 85);
     
+    stempColorGREEN += (secondi.intensity[i]*secondi.green);
+    stempColorGREEN = constrain(stempColorGREEN, 0, 85);
+    
+    stempColorBLUE += (secondi.intensity[i]*secondi.blue);   
+    stempColorRED = constrain(stempColorBLUE, 0, 85);
+/*
+    Serial.print("stempColorRed = "); Serial.print(stempColorRED); Serial.println();
+    Serial.print("stempColorGreen = "); Serial.print(stempColorGREEN); Serial.println();
+    Serial.print("stempColorBlue = "); Serial.print(stempColorBLUE); Serial.println();
+*/      
+    pixels.setPixelColor(i, pixels.Color(stempColorRED, stempColorGREEN, stempColorBLUE)); // set up each pixel' seconds' parameter
+    pixels.setPixelColor(i, pixels.Color(mtempColorRED, mtempColorGREEN, mtempColorBLUE)); // set up each pixel' minutes' parameter
+    pixels.setPixelColor(i, pixels.Color(htempColorRED, htempColorGREEN, htempColorBLUE)); // set up each pixel' hours' parameter
+    //unitPixelSet(i, secondi);
+    //unitPixelSet(i, minuti);
+    //unitPixelSet(i, ore);
+
   }
 
   pixels.show(); //upload data to WS2812
